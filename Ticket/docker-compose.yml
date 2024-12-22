@@ -7,7 +7,7 @@ services:
     depends_on:
       - postgres
     environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:dev}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-ticket:5432/ticketdb
       - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
