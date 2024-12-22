@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: EventSearch
+  elasticsearch:
+      rest:
+        uris: http://elasticsearch:9200
+    
+    
+  data:
+    elasticsearch:
+      repositories:
+        enabled: true  # Enable Elasticsearch repositories
+
+server:
+  port: 8087
+
+  
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eurekaserver:8761/eureka/
+  instance:
+    preferIpAddress: true
+
+events:
+  api:
+    url: http://event-service/api/events/v2/search
+    getEventByIdUrl: http://event-service/api/events/getEventbyVenueId
+
+venues:
+  api:
+    url: http://venueservice/api/venue/v2/search
+    getVenueByIdUrl: http://venueservice/api/venue/getVenueById

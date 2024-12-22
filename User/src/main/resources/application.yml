@@ -1,0 +1,27 @@
+
+spring:
+  application:
+    name: UserService
+  datasource:
+    url: jdbc:postgresql://postgres:5432/userdb
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: 8081
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eurekaserver:8761/eureka/
+  instance:
+    preferIpAddress: true
+
+auth0:
+  domainUrl: {$AUTH0_DOMAIN_URL}

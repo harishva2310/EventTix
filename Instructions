@@ -1,0 +1,37 @@
+Ticket Booking app details:
+
+Build package without tests:
+./mvnw clean package -DskipTests
+
+
+User app:
+port = 8081
+db port = 5432
+Status: Running
+
+Venue app:
+port = 8084
+db port = 5435
+Status: Running
+
+Ticket app:
+port = 8082
+db port = 5433
+Status: Running
+
+Event app:
+port = 8083
+db port = 5434
+Status: Running
+
+Booking app:
+port = 8085
+db port = 5436
+
+Gateway service: 
+port = 8086
+
+
+
+
+http://localhost:<port>/swagger-ui.html

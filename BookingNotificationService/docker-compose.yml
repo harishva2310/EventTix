@@ -1,0 +1,16 @@
+
+services:
+  bookingnotificationapp:
+    build: .
+    environment:
+      - MJ_APIKEY_PUBLIC=${MJ_APIKEY_PUBLIC}
+      - MJ_APIKEY_PRIVATE=${MJ_APIKEY_PRIVATE}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+    ports:
+      - "8089:8089"
+    networks:
+      - ticketapp-network
+
+networks:
+  ticketapp-network:
+    external: true

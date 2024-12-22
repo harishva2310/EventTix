@@ -1,0 +1,11 @@
+services:
+  eurekaserver:
+    build: .
+    ports:
+      - 8761:8761
+    networks:
+      - ticketapp-network
+
+networks:
+  ticketapp-network:
+    external: true

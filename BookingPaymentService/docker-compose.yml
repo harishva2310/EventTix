@@ -1,0 +1,14 @@
+
+services:
+  paymentapp:
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+    build: .
+    ports:
+      - "8088:8088"
+    networks:
+      - ticketapp-network
+
+networks:
+  ticketapp-network:
+    external: true

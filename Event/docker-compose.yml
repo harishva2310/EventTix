@@ -1,0 +1,36 @@
+
+services:
+  eventapp:
+    build: .
+    ports:
+      - "8083:8083"
+    depends_on:
+      - postgres
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-event:5432/eventdb
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+    networks:
+      - ticketapp-network
+
+  postgres:
+    image: postgres:13
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_DB=eventdb
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres-eventdata:/var/lib/postgresql/data
+    networks:
+      - ticketapp-network
+    hostname: postgres-event
+
+volumes:
+  postgres-eventdata:
+
+networks:
+  ticketapp-network:
+    external: true

@@ -1,0 +1,11 @@
+services:
+  eventsearchapp:
+    build: .
+    ports:
+      - 8087:8087
+    networks:
+      - ticketapp-network
+
+networks:
+  ticketapp-network:
+    external: true

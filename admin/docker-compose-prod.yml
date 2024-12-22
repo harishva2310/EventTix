@@ -1,0 +1,15 @@
+services:
+  admin-dashboard:
+    build: 
+      context: .
+      dockerfile: Dockerfile.prod
+    ports:
+      - "5174:5174"
+    networks:
+      - ticketapp-network
+    restart: unless-stopped
+    
+
+networks:
+  ticketapp-network:
+    external: true

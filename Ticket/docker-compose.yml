@@ -1,0 +1,36 @@
+
+services:
+  ticketapp:
+    build: .
+    ports:
+      - "8084:8084"
+    depends_on:
+      - postgres
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:dev}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-ticket:5432/ticketdb
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+    networks:
+      - ticketapp-network
+  postgres:
+    image: postgres:13
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_DB=ticketdb
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres-ticketdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - ticketapp-network
+    hostname: postgres-ticket
+
+volumes:
+  postgres-ticketdata:
+
+networks:
+  ticketapp-network:
+    external: true

@@ -1,0 +1,28 @@
+server:
+  port: 8089
+
+spring:
+  application:
+    name: booking-notification-service
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      group-id: notification-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eurekaserver:8761/eureka/
+  instance:
+    preferIpAddress: true
+
+logging:
+  level:
+    root: INFO
+    com.ticketbooking: DEBUG
+    org.springframework.web: INFO

@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: Booking-Service
+  datasource:
+    url: jdbc:postgresql://postgres:5432/bookingdb
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  kafka:
+    bootstrap-servers: kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+server:
+  port: 8085
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eurekaserver:8761/eureka/
+  instance:
+    preferIpAddress: true
+
+logging:
+  level:
+    root: INFO
+    com.ticketbooking: DEBUG
+    org.springframework.web: WARN
+
+auth0:
+  domainUrl: ${AUTH0_DOMAIN_URL}
+
+qr:
+  secret:
+    key: ${QR_SECRET_KEY}

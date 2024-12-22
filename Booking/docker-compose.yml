@@ -1,0 +1,36 @@
+
+services:
+  bookingapp:
+    build: .
+    ports:
+      - "8085:8085"
+    depends_on:
+      - postgres
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-booking:5432/bookingdb
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+    networks:
+      - ticketapp-network
+
+  postgres:
+    image: postgres:13
+    ports:
+      - "5436:5432"
+    environment:
+      - POSTGRES_DB=bookingdb
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres-bookingdata:/var/lib/postgresql/data
+    networks:
+      - ticketapp-network
+    hostname: postgres-booking
+
+volumes:
+  postgres-bookingdata:
+
+networks:
+  ticketapp-network:
+    external: true

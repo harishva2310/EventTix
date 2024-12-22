@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  userapp:
+    build: .
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-user:5432/userdb
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+    networks:
+      - ticketapp-network
+
+  postgres:
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=userdb
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres-userdata:/var/lib/postgresql/data
+    networks:
+      - ticketapp-network
+    hostname: postgres-user
+
+volumes:
+  postgres-userdata:
+
+networks:
+  ticketapp-network:
+    external: true

@@ -1,0 +1,36 @@
+
+services:
+  venueapp:
+    build: .
+    ports:
+      - "8082:8082"
+    depends_on:
+      - postgres
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-venue:5432/venuedb
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+    networks:
+      - ticketapp-network
+
+  postgres:
+    image: postgres:13
+    ports:
+      - "5435:5432"
+    environment:
+      - POSTGRES_DB=venuedb
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres-venuedata:/var/lib/postgresql/data
+    networks:
+      - ticketapp-network
+    hostname: postgres-venue
+
+volumes:
+  postgres-venuedata:
+
+networks:
+  ticketapp-network:
+    external: true

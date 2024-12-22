@@ -1,0 +1,28 @@
+spring:
+    application:
+        name: BookingPaymentService
+
+stripe:
+    api:
+        key: ${STRIPE_API_KEY_PRIVATE}
+        public-key: ${STRIPE_API_KEY_PUBLIC}
+        
+
+server:
+  port: 8088
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eurekaserver:8761/eureka/
+  instance:
+    preferIpAddress: true
+
+logging:
+  level:
+    root: INFO
+    com.ticketbooking: WARN
+    org.springframework.web: WARN
+
+auth0:
+  domainUrl: ${AUTH0_DOMAIN_URL}

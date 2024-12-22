@@ -1,0 +1,17 @@
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - ticketapp-network
+
+networks:
+  ticketapp-network:
+    external: true
+
+volumes:
+  redis_data:

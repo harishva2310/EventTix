@@ -1,0 +1,19 @@
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    privileged: true
+    user: root
+    ports:
+      - 8090:8080
+      - 50000:50000
+    container_name: jenkins
+    volumes:
+      - jenkins_configuration:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /mnt/d/Ticket Booking app:/workspace/ticket-booking
+    environment:
+      - DOCKER_HOST=tcp://host.docker.internal:2375
+
+volumes:
+  jenkins_configuration:
+

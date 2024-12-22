@@ -1,0 +1,17 @@
+
+services:
+  admin-dashboard:
+    build: .
+    ports:
+      - "5174:5174"
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    networks:
+      - ticketapp-network
+
+networks:
+  ticketapp-network:
+    external: true

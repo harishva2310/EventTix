@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: VenueService
+  datasource:
+    url: jdbc:postgresql://postgres:5435/venuedb
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  elasticsearch:
+    rest:
+      uris: http://elasticsearch:9200
+    
+    
+  data:
+    elasticsearch:
+      repositories:
+        enabled: true  # Enable Elasticsearch repositories
+server:
+  port: 8082
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eurekaserver:8761/eureka/
+  instance:
+    preferIpAddress: true
+
+auth0:
+  domainUrl: ${AUTH0_DOMAIN_URL}
+
+logging:
+  level:
+    root: INFO
+    com.ticketbooking: DEBUG
+    org.springframework.web: INFO
