@@ -7,6 +7,9 @@ services:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl/eventix_public_key.key:/etc/nginx/ssl/eventix_public_key.key:ro
+      - ./ssl/eventix_private_key.key:/etc/nginx/ssl/eventix_private_key.key:ro
+      - ./ssl/origin_certificate.pem:/etc/nginx/ssl/origin_certificate.pem:ro
     networks:
       - ticketapp-network
 
