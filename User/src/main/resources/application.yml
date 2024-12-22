@@ -24,4 +24,4 @@ eureka:
     preferIpAddress: true
 
 auth0:
-  domainUrl: {$AUTH0_DOMAIN_URL}
+  domainUrl: ${AUTH0_DOMAIN_URL}
