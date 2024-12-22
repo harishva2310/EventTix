@@ -24,5 +24,3 @@ logging:
     com.ticketbooking: DEBUG
     org.springframework.web: INFO
 
-auth0:
-  domainUrl: ${AUTH0_DOMAIN_URL}

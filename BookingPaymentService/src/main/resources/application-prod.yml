@@ -24,5 +24,3 @@ logging:
     com.ticketbooking: WARN
     org.springframework.web: WARN
 
-auth0:
-  domainUrl: ${AUTH0_DOMAIN_URL}

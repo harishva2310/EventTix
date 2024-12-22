@@ -3,6 +3,7 @@ services:
   paymentapp:
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - AUTH0_DOMAIN_URL=${AUTH0_DOMAIN_URL}
     build: .
     ports:
       - "8088:8088"
