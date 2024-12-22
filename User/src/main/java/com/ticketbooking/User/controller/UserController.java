@@ -36,7 +36,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Value("${${AUTH0_DOMAIN_URL}}")
+    @Value("${AUTH0_DOMAIN_URL}")
     private String domainUrl;
 
     @GetMapping
