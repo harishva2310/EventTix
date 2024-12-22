@@ -33,9 +33,3 @@ logging:
     com.ticketbooking: DEBUG
     org.springframework.web: WARN
 
-auth0:
-  domainUrl: ${AUTH0_DOMAIN_URL}
-
-qr:
-  secret:
-    key: ${QR_SECRET_KEY}

@@ -46,12 +46,12 @@ public class BookingController {
     @Autowired
     private BookingService bookingService;
 
-    @Value("${qr.secret.key}")
+    @Value("${QR_SECRET_KEY}")
     private String qrSecretKey;
 
     private static final Logger logger = LoggerFactory.getLogger(BookingController.class);
 
-    @Value("${auth0.domainUrl}")
+    @Value("${AUTH0_DOMAIN_URL}")
     private String domainUrl;
 
     @Autowired
