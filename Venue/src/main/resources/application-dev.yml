@@ -30,8 +30,6 @@ eureka:
   instance:
     preferIpAddress: true
 
-auth0:
-  domainUrl: ${AUTH0_DOMAIN_URL}
 
 logging:
   level:

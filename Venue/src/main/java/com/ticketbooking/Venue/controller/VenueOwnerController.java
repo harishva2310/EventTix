@@ -42,7 +42,7 @@ public class VenueOwnerController {
     @Autowired
     private VenueOwnerService venueOwnerService;
 
-    @Value("${auth0.domainUrl}")
+    @Value("${AUTH0_DOMAIN_URL}")
     private String domainUrl;
 
     private static final Logger logger = LoggerFactory.getLogger(VenueOwnerController.class);

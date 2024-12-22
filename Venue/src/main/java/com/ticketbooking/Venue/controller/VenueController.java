@@ -50,7 +50,7 @@ public class VenueController {
     @Autowired
     private ElasticsearchClient elasticsearchClient;
 
-    @Value("${auth0.domainUrl}")
+    @Value("${AUTH0_DOMAIN_URL}")
     private String domainUrl;
 
     private static final Logger logger = LoggerFactory.getLogger(VenueController.class);
