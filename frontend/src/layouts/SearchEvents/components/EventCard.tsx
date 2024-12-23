@@ -11,7 +11,7 @@ interface EventCardProps {
 
 export function EventCard({ eventData }: EventCardProps) {
   const { event, venue } = eventData;
-  const lowestPrice = Math.min(...(event.event_details.ticketTypes?.map(t => t.price) || [0]));
+  
   const navigate = useNavigate();
   return (
     <Card className="hover:shadow-lg transition-shadow">
@@ -21,9 +21,7 @@ export function EventCard({ eventData }: EventCardProps) {
             <h3 className="text-2xl font-bold">{event.event_name}</h3>
             <p className="text-sm text-muted-foreground text-left">{event.event_type}</p>
           </div>
-          <div className="text-right">
-            <p className="text-lg font-bold">From ${lowestPrice}</p>
-          </div>
+          
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">

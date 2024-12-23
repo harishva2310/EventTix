@@ -126,9 +126,9 @@ export function UserCalendar() {
     }
 
     return (
-        <div className="container mx-auto p-2 sm:p-6">
+        <div className="container mx-auto p-0 sm:p-6 overflow-x-hidden">
             <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-8 text-foreground">My Event Calendar</h1>
-            <div className="h-[500px] sm:h-[700px] max-w-[80vw] md:w-full">
+            <div className="h-[500px] sm:h-[800px] max-w-[80vw] md:w-full">
                 <Calendar
                     localizer={localizer}
                     events={events}
@@ -137,7 +137,7 @@ export function UserCalendar() {
                     components={{
                         event: EventComponent
                     }}
-                    className="bg-background rounded-lg shadow-lg p-2 sm:p-4"
+                    className="bg-background rounded-lg shadow-lg p-0 sm:p-4"
                     views={['month' ,'week','day','agenda']}
                     defaultView={window.innerWidth < 640 ? Views.AGENDA : Views.MONTH}
                     

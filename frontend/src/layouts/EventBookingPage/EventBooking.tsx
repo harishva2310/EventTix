@@ -115,8 +115,8 @@ export default function EventDetailsPage() {
                                                     >
                                                         <div className="flex items-center justify-between w-full pr-4">
                                                             <div className="flex items-center gap-3">
-                                                                <Ticket className="h-5 w-5 text-primary" />
-                                                                <span className="font-semibold">Section: {section.sectionName}</span>
+                                                                <Ticket className="h-5 w-5 text-muted-foreground" />
+                                                                <span className="text-muted-foreground text-zinc-950 font-bold">Section: {section.sectionName}</span>
                                                             </div>
                                                             <div className="flex items-center gap-2">
                                                                 <span className="text-sm text-muted-foreground">

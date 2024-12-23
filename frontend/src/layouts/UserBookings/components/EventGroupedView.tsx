@@ -7,9 +7,9 @@ interface EventGroupedViewProps {
 
 export function EventGroupedView({ groupedBookings }: EventGroupedViewProps) {
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 overflow-x-hidden">
             {Object.entries(groupedBookings).map(([eventId, { eventData, bookings }]) => (
-                <div key={eventId} className="mb-8 bg-background/100 rounded-lg shadow-lg p-6">
+                <div key={eventId} className="mb-8 bg-background/100 rounded-lg shadow-lg p-6 overflow-x-hidden">
                     <div className="mb-6">
                         <h2 className="text-xl font-semibold text-foreground">{eventData?.event.event_name}</h2>
                         <p className="text-muted-foreground">{eventData?.event.event_description}</p>
@@ -38,7 +38,7 @@ export function EventGroupedView({ groupedBookings }: EventGroupedViewProps) {
                         )}
                     </div>
 
-                    <div className="grid gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="grid gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar overflow-x-hidden">
                         {bookings.map((booking: Booking) => (
                             <div key={booking.bookingId} className="border rounded-lg p-4 space-y-2">
                                 <div className="flex justify-between items-center">
@@ -79,7 +79,7 @@ export function EventGroupedView({ groupedBookings }: EventGroupedViewProps) {
                                         <img
                                             src={`data:image/png;base64,${booking.bookingDetails.qrCode}`}
                                             alt="Ticket QR Code"
-                                            className="w-48 h-48"
+                                            className="w-32 h-32 sm:w-48 sm:h-48"
                                         />
                                     )}
                                 </div>

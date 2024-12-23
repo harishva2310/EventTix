@@ -48,9 +48,9 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="w-full overflow-x-hidden">
       {/* Hero Section with Background Image */}
-      <section className="relative">
+      <section className="relative w-full">
         {/* Background Image with Overlay */}
         <div
           className="absolute inset-0 z-0"
@@ -60,40 +60,37 @@ export default function LandingPage() {
             backgroundPosition: 'center',
           }}
         >
-          {/* Dark Overlay */}
           <div className="absolute inset-0 bg-black/30" />
         </div>
 
         {/* Content */}
-        <div className="relative z-10 container mx-auto px-4 pt-32 pb-20">
+        <div className="relative z-10 px-4 sm:px-6 pt-20 sm:pt-32 pb-16 sm:pb-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center"
+            className="text-center max-w-[90vw] sm:max-w-none mx-auto"
           >
-            <h1 className="text-6xl font-bold tracking-tight text-white">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight text-white">
               Book Your Next Adventure
             </h1>
-            <p className="mt-6 text-xl text-gray-200 max-w-2xl mx-auto">
+            <p className="mt-4 sm:mt-6 text-base sm:text-xl text-gray-200 max-w-2xl mx-auto">
               Discover and book tickets for the most exciting events happening around you.
-              From concerts to conferences, we've got you covered. 
-              
+              From concerts to conferences, we've got you covered.
             </p>
-            <p className="mt-6 text-xl text-gray-200 max-w-2xl mx-auto">
-            Disclaimer: This is a tech demo project and all the images and data used in this project are for demonstration purposes only.
+            <p className="mt-4 sm:mt-6 text-base sm:text-xl text-gray-200 max-w-2xl mx-auto">
+              Disclaimer: This is a tech demo project and all the images and data used in this project are for demonstration purposes only.
             </p>
-            <div className="mt-10 flex gap-4 justify-center">
+            <div className="mt-6 sm:mt-10 flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 w-full sm:w-auto"
               >
-                <Link className="bg-primary text-primary-foreground hover:bg-primary/90" to="/events">
-                  Browse Events</Link>
+                <Link to="/events">Browse Events</Link>
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="border-primary text-primary hover:bg-primary/10"
+                className="border-primary text-primary hover:bg-primary/10 w-full sm:w-auto"
               >
                 Learn More
               </Button>
@@ -103,14 +100,14 @@ export default function LandingPage() {
       </section>
 
       {/* Featured Events Section */}
-      <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">Featured Events</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <section className="px-4 sm:px-6 py-12 sm:py-16">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12">Featured Events</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {loading ? (
             <div className="text-center col-span-3">Loading events...</div>
           ) : (
             events.map((eventData) => (
-              <div key={eventData.event.event_id} className="rounded-lg border bg-card p-6 shadow-lg hover:shadow-xl transition-shadow">
+              <div key={eventData.event.event_id} className="rounded-lg border bg-card p-4 sm:p-6 shadow-lg hover:shadow-xl transition-shadow flex flex-col">
                 <div className="aspect-video bg-muted rounded-md mb-4">
                   {eventData.event.event_details.cover_picture_path && eventData.event.event_details.cover_picture_path.length > 0 ? (
                     <img
@@ -122,19 +119,17 @@ export default function LandingPage() {
                     <div className="w-full h-full bg-muted rounded-md" />
                   )}
                 </div>
-                <h3 className="text-xl font-semibold mb-2">{eventData.event.event_name}</h3>
-                <p className="text-muted-foreground mb-4">{eventData.event.event_description}</p>
-                <div className="flex items-center gap-2">
+                <h3 className="text-lg sm:text-xl font-semibold mb-2">{eventData.event.event_name}</h3>
+                <p className="text-sm sm:text-base text-muted-foreground mb-4">{eventData.event.event_description}</p>
+                <div className="flex items-center gap-2 mb-4 text-sm sm:text-base">
                   <MapPin className="h-4 w-4" />
                   <span>{eventData.venue.venue_name}, {eventData.venue.venue_city}</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-primary">
-                    ${Math.min(...(eventData.event.event_details.ticketTypes?.map(t => t.price) || [0]))}
-                  </span>
+                <div className="mt-auto">
                   <Button
                     variant="secondary"
                     onClick={() => navigate(`/event-details/${eventData.event.event_id}`)}
+                    className="w-full"
                   >
                     Book Now
                   </Button>
@@ -145,26 +140,24 @@ export default function LandingPage() {
         </div>
       </section>
 
-
       {/* Features Section */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <span className="text-4xl mb-4 block">🎫</span>
-              <h3 className="text-xl font-semibold mb-2">Easy Booking</h3>
-              <p className="text-muted-foreground">Search for your events by clicking Events and book tickets easily</p>
-            </div>
-            <div className="text-center">
-              <span className="text-4xl mb-4 block">🔒</span>
-              <h3 className="text-xl font-semibold mb-2">Secure Payments</h3>
-              <p className="text-muted-foreground">Pay for your orders using Stripe with options such as Credit/Debit Card, Amazon Pay etc</p>
-            </div>
-            <div className="text-center">
-              <span className="text-4xl mb-4 block">🏦</span>
-              <h3 className="text-xl font-semibold mb-2">Verified Tickets and Booking</h3>
-              <p className="text-muted-foreground">Each ticket and booking for an event in our system is verified by our security algorithms designed to prevent counterfeiting and theft of tickets</p>
-            </div>
-          
+      <section className="px-4 sm:px-6 py-12 sm:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+          <div className="text-center">
+            <span className="text-3xl sm:text-4xl mb-3 sm:mb-4 block">🎫</span>
+            <h3 className="text-lg sm:text-xl font-semibold mb-2">Easy Booking</h3>
+            <p className="text-sm sm:text-base text-muted-foreground">Search for your events by clicking Events and book tickets easily</p>
+          </div>
+          <div className="text-center">
+            <span className="text-3xl sm:text-4xl mb-3 sm:mb-4 block">🔒</span>
+            <h3 className="text-lg sm:text-xl font-semibold mb-2">Secure Payments</h3>
+            <p className="text-sm sm:text-base text-muted-foreground">Pay for your orders using Stripe with options such as Credit/Debit Card, Amazon Pay etc</p>
+          </div>
+          <div className="text-center">
+            <span className="text-3xl sm:text-4xl mb-3 sm:mb-4 block">🏦</span>
+            <h3 className="text-lg sm:text-xl font-semibold mb-2">Verified Tickets and Booking</h3>
+            <p className="text-sm sm:text-base text-muted-foreground">Each ticket and booking for an event in our system is verified by our security algorithms designed to prevent counterfeiting and theft of tickets</p>
+          </div>
         </div>
       </section>
     </div>

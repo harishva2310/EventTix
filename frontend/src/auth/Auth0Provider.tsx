@@ -15,7 +15,7 @@ const Auth0ProviderWithHistory = ({ children }: Auth0ProviderProps) => {
       domain={domain}
       clientId={clientId}
       authorizationParams={{
-        redirect_uri: window.location.origin,
+        redirect_uri: window.location.origin+"/profile",
         audience: "https://ticketbookingapp.auth0/api",
         scope: "openid profile email read:profile update:profile"
       }}

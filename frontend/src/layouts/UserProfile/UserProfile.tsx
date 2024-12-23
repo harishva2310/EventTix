@@ -88,6 +88,7 @@ export function Profile() {
           </Alert>
         )}
         <h1 className="text-2xl font-bold text-center">Profile Settings</h1>
+        <h4  className="text-md font-medium text-center">Please enter/verify your details to book tickets.</h4>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
