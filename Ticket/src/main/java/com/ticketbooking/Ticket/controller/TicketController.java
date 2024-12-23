@@ -62,7 +62,7 @@ public class TicketController {
     @Autowired
     private TicketSignatureService ticketSignatureService;
 
-    @Value("{$AUTH0_DOMAIN_URL}")
+    @Value("${AUTH0_DOMAIN_URL}")
     private String domainUrl;
 
     private static final Logger logger = LoggerFactory.getLogger(TicketController.class);

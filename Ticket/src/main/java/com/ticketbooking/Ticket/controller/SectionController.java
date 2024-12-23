@@ -28,7 +28,7 @@ public class SectionController {
     @Autowired
     private SectionRepository sectionRepository;
 
-    @Value("{$AUTH0_DOMAIN_URL}")
+    @Value("${AUTH0_DOMAIN_URL}")
     private String domainUrl;
 
     private static final Logger logger = LoggerFactory.getLogger(SectionController.class);
