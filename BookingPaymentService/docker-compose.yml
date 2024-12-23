@@ -4,6 +4,8 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
       - AUTH0_DOMAIN_URL=${AUTH0_DOMAIN_URL}
+      - STRIPE_API_KEY_PRIVATE=${STRIPE_API_KEY_PRIVATE}
+      - STRIPE_API_KEY_PUBLIC=${STRIPE_API_KEY_PUBLIC}
     build: .
     ports:
       - "8088:8088"
