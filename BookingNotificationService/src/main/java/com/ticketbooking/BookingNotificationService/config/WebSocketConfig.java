@@ -20,7 +20,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry
             .addEndpoint("/ws-notifications")
-            .setAllowedOriginPatterns("http://localhost", "http://localhost:5173")
+            .setAllowedOriginPatterns("https://eventix.website")
             .withSockJS()
             .setWebSocketEnabled(true)
             .setHeartbeatTime(25000);
