@@ -9,6 +9,7 @@ interface Auth0ProviderProps {
 const Auth0ProviderWithHistory = ({ children }: Auth0ProviderProps) => {
     const domain = import.meta.env.VITE_AUTH0_DOMAIN;
     const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
+    console.log("Window: "+window.location.origin)
 
   return (
     <Auth0Provider
@@ -22,6 +23,7 @@ const Auth0ProviderWithHistory = ({ children }: Auth0ProviderProps) => {
       cacheLocation="localstorage"
       
     >
+      
       {children}
     </Auth0Provider>
   );
