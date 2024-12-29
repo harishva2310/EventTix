@@ -11,7 +11,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { Plus, X } from 'lucide-react'
 import { useVenueStore } from '@/stores/VenueStore'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-
+import { Upload } from 'lucide-react'
 
 // Add this new interface
 interface CustomAttribute {
@@ -28,6 +28,9 @@ export function AddEventPage() {
     const selectedVenue = venues.find(v => v.venueId === Number(selectedVenueId))
 
     const [customAttributes, setCustomAttributes] = useState<CustomAttribute[]>([])
+
+    const minio_access_key = import.meta.env.VITE_MINIO_ACCESS_KEY
+    const minio_secret_key = import.meta.env.VITE_MINIO_SECRET_KEY
 
     const handleDetailChange = (key: string, value: any) => {
         setFormData(prev => ({
@@ -78,6 +81,8 @@ export function AddEventPage() {
     }
 
 
+
+
     const [formData, setFormData] = useState({
         eventName: '',
         venueId: 0,
@@ -95,6 +100,42 @@ export function AddEventPage() {
 
         }
     })
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        const uploadData = new FormData()
+        uploadData.append('file', file)
+
+        try {
+            const response = await axios.post('/img-upload-service/upload', uploadData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+
+            const imagePath = response.data.path
+            const newImages = [...(formData.eventDetails?.eventImages || [])] as string[]
+            newImages[index] = imagePath
+            handleDetailChange('eventImages', newImages)
+
+            toast({
+                title: "Success",
+                description: "Image uploaded successfully",
+            })
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "Failed to upload image",
+                variant: "destructive"
+            })
+        }
+    }
+
+
+
+
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
@@ -123,9 +164,9 @@ export function AddEventPage() {
                 {
                     ...formData,
                     eventDetails: {
-                    ...formData.eventDetails,
-                    ...customAttributesObj
-                }
+                        ...formData.eventDetails,
+                        ...customAttributesObj
+                    }
                 },
                 {
                     headers: {
@@ -197,13 +238,15 @@ export function AddEventPage() {
 
                             <div className="space-y-2">
                                 <Label htmlFor="eventStatus">Event Status</Label>
-                                <Input
-                                    id="eventStatus"
-                                    name="eventStatus"
-                                    value={formData.eventStatus}
-                                    onChange={handleInputChange}
-                                    required
-                                />
+                                <Select onValueChange={(value) => handleInputChange({ target: { name: 'eventStatus', value } } as any)} value={formData.eventStatus}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="UPCOMING">UPCOMING</SelectItem>
+                                        <SelectItem value="CANCELLED">CANCELLED</SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </div>
 
                             <div className="space-y-2">
@@ -381,25 +424,47 @@ export function AddEventPage() {
                                     <Label>Event Images</Label>
                                     {(formData.eventDetails?.eventImages || []).map((image, index) => (
                                         <div key={index} className="flex items-center gap-2">
-                                            <Input
-                                                value={image}
-                                                onChange={(e) => {
-                                                    const newImages = [...(formData.eventDetails?.eventImages || [])] as string[]
-                                                    newImages[index] = e.target.value
-                                                    handleDetailChange('eventImages', newImages)
-                                                }}
-                                            />
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => {
-                                                    const newImages = formData.eventDetails?.eventImages.filter((_, i) => i !== index)
-                                                    handleDetailChange('eventImages', newImages)
-                                                }}
-                                            >
-                                                <X className="h-4 w-4" />
-                                            </Button>
+                                            <div className="flex-1">
+                                                <Input
+                                                    value={image}
+                                                    onChange={(e) => {
+                                                        const newImages = [...(formData.eventDetails?.eventImages || [])] as string[]
+                                                        newImages[index] = e.target.value
+                                                        handleDetailChange('eventImages', newImages)
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="file"
+                                                    id={`image-upload-${index}`}
+                                                    className="hidden"
+                                                    accept="image/*"
+                                                    onChange={(e) => handleImageUpload(e, index)}
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => {
+                                                        const fileInput = document.getElementById(`image-upload-${index}`) as HTMLInputElement
+                                                        if (fileInput) fileInput.click()
+                                                    }}
+                                                >
+                                                    <Upload className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => {
+                                                        const newImages = formData.eventDetails?.eventImages.filter((_, i) => i !== index)
+                                                        handleDetailChange('eventImages', newImages)
+                                                    }}
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </Button>
+                                            </div>
                                         </div>
                                     ))}
                                     <Button
@@ -408,13 +473,14 @@ export function AddEventPage() {
                                         size="sm"
                                         onClick={() => {
                                             const currentImages = formData.eventDetails?.eventImages || []
-                                            handleDetailChange('eventImages', [...currentImages, ''])
+                                            handleDetailChange('eventImages', [...currentImages, 'eventimagebucket/'])
                                         }}
                                     >
                                         <Plus className="h-4 w-4 mr-2" />
                                         Add Image Path
                                     </Button>
                                 </div>
+
 
                                 <div className="space-y-2">
                                     <Label>Cover Picture Path</Label>
@@ -447,7 +513,7 @@ export function AddEventPage() {
                                         size="sm"
                                         onClick={() => {
                                             const currentPaths = formData.eventDetails?.cover_picture_path || []
-                                            handleDetailChange('cover_picture_path', [...currentPaths, ''])
+                                            handleDetailChange('cover_picture_path', [...currentPaths, 'eventimagebucket/'])
                                         }}
                                     >
                                         <Plus className="h-4 w-4 mr-2" />

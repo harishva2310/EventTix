@@ -1,4 +1,4 @@
-import { CalendarDays, MapPin, Clock, Guitar, Mic, Ticket, ArrowLeft } from 'lucide-react';
+import { CalendarDays, MapPin, Clock, Guitar, Mic, Ticket, ArrowLeft, Car } from 'lucide-react';
 
 interface PerformersSectionProps {
   eventDetails: any;
@@ -20,6 +20,14 @@ export const EventPerformersSection = ({ eventDetails }: PerformersSectionProps)
           <Mic className="h-5 w-5 sm:h-6 sm:w-6 text-primary mt-1 sm:mt-0" />
           <span className="text-sm sm:text-base md:text-lg break-words">
             Supporting Acts: {eventDetails.supportingActs.join(', ')}
+          </span>
+        </div>
+      )}
+      {eventDetails.amenities && eventDetails.amenities.length > 0 && (
+        <div className="flex items-start sm:items-center gap-2 sm:gap-3">
+          <Car className="h-5 w-5 sm:h-6 sm:w-6 text-primary mt-1 sm:mt-0" />
+          <span className="text-sm sm:text-base md:text-lg break-words">
+            Amenities: {eventDetails.amenities.join(', ')}
           </span>
         </div>
       )}
