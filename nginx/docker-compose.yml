@@ -5,6 +5,7 @@ services:
     image: nginx:latest
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./ssl/eventix_public_key.pem:/etc/nginx/ssl/eventix_public_key.pem:ro
