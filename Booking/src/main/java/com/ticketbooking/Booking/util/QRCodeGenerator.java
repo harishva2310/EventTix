@@ -10,9 +10,11 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.ticketbooking.Booking.entity.Booking;
 
 public class QRCodeGenerator {
@@ -52,8 +54,14 @@ public static String generateQRCodeBase64(Booking booking, String secretKey) thr
         logger.debug("Secure Content: {}", secureContent);
         
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
-        BitMatrix bitMatrix = qrCodeWriter.encode(secureContent, BarcodeFormat.QR_CODE, 200, 200);
-        
+        // Optimize QR code generation parameters
+        BitMatrix bitMatrix = qrCodeWriter.encode(secureContent, BarcodeFormat.QR_CODE, 200, 200,
+                Map.of(
+                        EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M,
+                        EncodeHintType.MARGIN, 1
+                        
+                ));
+
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
         logger.info("QR Code generated successfully");

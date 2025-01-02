@@ -17,5 +17,5 @@ public interface EventElasticSearchRepository extends ElasticsearchRepository<Ev
 
     List<EventDocument> findByVenueId(Long venueId);
     Page<EventDocument> findByEventStartTimeGreaterThan(LocalDateTime dateTime, Pageable pageable);
-    Page<EventWithVenueDocument> findByEventEndTimeLessThan(LocalDateTime dateTime, Pageable pageable);
+    
 }

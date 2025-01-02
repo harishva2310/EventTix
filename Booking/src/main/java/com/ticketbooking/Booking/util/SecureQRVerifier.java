@@ -42,6 +42,61 @@ public class SecureQRVerifier {
         this.restTemplate = restTemplate;
     }
 
+    public VerificationResult verifyQRCodeText(String decodedContent, String secretKey, String eventSecretKey) throws Exception {
+        String[] parts = decodedContent.split("\\|");
+    
+        if (parts.length != 14) {
+            logger.error("Invalid QR code content.");
+            return new VerificationResult(false, null, "Invalid QR code format");
+        }
+    
+        String data = String.join("|", Arrays.copyOfRange(parts, 0, 13));
+        String signature = parts[13];
+    
+        if (!QRSecurityUtil.verifyHMAC(data, signature, secretKey)) {
+            logger.error("Signature verification failed.");
+            return new VerificationResult(false, null, "Invalid signature");
+        }
+    
+        LocalDateTime bookingDateTime = LocalDateTime.parse(parts[2] + "T" + parts[3], DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        LocalDateTime eventEndDate = LocalDateTime.parse(parts[7], DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    
+        Map<String, Object> ticketInfo = objectMapper.readValue(parts[12], Map.class);
+        List<Map<String, Object>> ticketsToVerify = Arrays.asList(ticketInfo);
+    
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<List<Map<String, Object>>> requestEntity = new HttpEntity<>(ticketsToVerify, headers);
+    
+        try {
+            Map<String, List<Map<String, Object>>> response = restTemplate.postForObject(
+                    TICKET_VERIFY_URL + "?secretKey=" + eventSecretKey,
+                    requestEntity,
+                    Map.class
+            );
+    
+            List<Map<String, Object>> results = response.get("results");
+            Map<String, Object> ticketResult = results.stream()
+                    .filter(result -> result.get("ticketId").equals(ticketInfo.get("ticketId")))
+                    .findFirst()
+                    .orElse(null);
+    
+            if (ticketResult == null) {
+                return new VerificationResult(false, ticketInfo, "Ticket verification failed");
+            }
+    
+            boolean isTimeValid = bookingDateTime.isBefore(eventEndDate) && LocalDateTime.now().isBefore(eventEndDate);
+            boolean isTicketValid = (Boolean) ticketResult.get("valid");
+            String message = (String) ticketResult.get("message");
+    
+            return new VerificationResult(isTicketValid && isTimeValid, ticketInfo, message);
+    
+        } catch (Exception e) {
+            logger.error("Ticket verification service error: ", e);
+            return new VerificationResult(false, null, "Verification service error");
+        }
+    }
+
     
 
     public  VerificationResult verifyQRCode(String base64Image, String secretKey, String eventSecretKey) throws Exception {

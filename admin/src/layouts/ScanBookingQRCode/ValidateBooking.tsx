@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Html5QrcodeScanner } from 'html5-qrcode'
+import { Html5QrcodeScanner, Html5QrcodeSupportedFormats } from 'html5-qrcode'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
@@ -12,6 +12,7 @@ export default function QRScanner() {
   const [eventSecretKey, setEventSecretKey] = useState('')
   const [scanning, setScanning] = useState(false)
   const { getAccessTokenSilently } = useAuth0();
+  const formatsToSupport = [Html5QrcodeSupportedFormats.QR_CODE]
 
   useEffect(() => {
     if (scanning) {
@@ -20,7 +21,12 @@ export default function QRScanner() {
           width: 250,
           height: 250,
         },
-        fps: 5,
+        fps: 60, // Increased from 30
+        formatsToSupport: formatsToSupport,
+        disableFlip: true, // Reduces processing overhead
+        experimentalFeatures: {
+          useBarCodeDetectorIfSupported: true
+        }
       }, false)
 
       scanner.render(onScanSuccess, onScanError)
@@ -34,39 +40,25 @@ export default function QRScanner() {
   const onScanSuccess = async (decodedText: string, decodedResult: any) => {
     try {
       const token = await getAccessTokenSilently()
-      
-      // Create a canvas to capture the QR code image
-      const canvas = document.createElement('canvas')
-      const video = document.querySelector('video')
-      const context = canvas.getContext('2d')
-      
-      // Ensure video element exists and has loaded
-      if (video && video.readyState === video.HAVE_ENOUGH_DATA && context) {
-        canvas.width = video.videoWidth
-        canvas.height = video.videoHeight
-        context.drawImage(video, 0, 0, canvas.width, canvas.height)
-        
-        // Get base64 image data
-        const base64Image = canvas.toDataURL('image/png').split(',')[1]
-        
-        const response = await axios.post(
-          `/api/bookings/verifyQRCode?eventSecretKey=${eventSecretKey}`,
-          base64Image,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'text/plain'
-            }
+
+      const response = await axios.post(
+        `/api/bookings/verifyQRCode?eventSecretKey=${eventSecretKey}`,
+        decodedText,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'text/plain'
           }
-        )
-  
-        toast({
-          title: response.data.valid ? "Valid Ticket ✓" : "Invalid Ticket ✗",
-          description: response.data.message,
-          variant: response.data.valid ? "default" : "destructive",
-          className: response.data.valid ? "bg-green-500 text-white" : "bg-red-500 text-white"
-        })
-      }
+        }
+      )
+
+      toast({
+        title: response.data.valid ? "Valid Ticket ✓" : "Invalid Ticket ✗",
+        description: response.data.message,
+        variant: response.data.valid ? "default" : "destructive",
+        className: response.data.valid ? "bg-green-500 text-white" : "bg-red-500 text-white"
+      })
+
     } catch (error) {
       console.error('Error details:', error)
       toast({
@@ -77,6 +69,7 @@ export default function QRScanner() {
       })
     }
   }
+
   const onScanError = (error: string) => {
     console.warn(error)
   }
@@ -95,7 +88,7 @@ export default function QRScanner() {
               value={eventSecretKey}
               onChange={(e) => setEventSecretKey(e.target.value)}
             />
-            
+
             <Button
               onClick={() => setScanning(!scanning)}
               className="w-full"

@@ -139,11 +139,11 @@ public class BookingController {
     }
 
     @PostMapping("/verifyQRCode")
-    public ResponseEntity<Map<String, Object>> verifyQRCode(@RequestBody String qrCodeBase64,
+    public ResponseEntity<Map<String, Object>> verifyQRCode(@RequestBody String qrCodeText,
             @RequestHeader("Authorization") String token, @RequestParam("eventSecretKey") String eventSecretKey) {
         try {
             verifyToken(token);
-            SecureQRVerifier.VerificationResult result = secureQRVerifier.verifyQRCode(qrCodeBase64, qrSecretKey, eventSecretKey);
+            SecureQRVerifier.VerificationResult result = secureQRVerifier.verifyQRCodeText(qrCodeText, qrSecretKey, eventSecretKey);
             Map<String, Object> response = new HashMap<>();
             response.put("valid", result.isValid());
             response.put("message", result.getMessage());
