@@ -1,5 +1,6 @@
 package com.ticketapp.EventSearch.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.ticketapp.EventSearch.dao.EventElasticSearchRepository;
 import com.ticketapp.EventSearch.dao.EventWithVenueDocument;
+import com.ticketapp.EventSearch.dao.EventWithVenueElasticRepository;
 import com.ticketapp.EventSearch.dao.VenueElasticSearchRepository;
 import com.ticketapp.EventSearch.entity.EventDocument;
 import com.ticketapp.EventSearch.entity.VenueDocument;
@@ -40,17 +42,21 @@ public class EventSyncService {
     @Autowired
     private ElasticsearchClient elasticsearchClient;
 
+    @Autowired
+    private EventWithVenueElasticRepository eventWithVenueElasticRepository;
+
     @Scheduled(fixedRate = 120000) // 2 minutes in milliseconds
     public void syncEventsAndVenues() {
         AtomicInteger processedCount = new AtomicInteger(0);
         AtomicInteger errorCount = new AtomicInteger(0);
+        LocalDateTime currentDateTime = LocalDateTime.now();
 
         try {
             int pageNumber = 0;
             Page<EventDocument> eventPage;
 
             do {
-                eventPage = eventRepository.findAll(PageRequest.of(pageNumber, BATCH_SIZE));
+                eventPage = eventRepository.findByEventStartTimeGreaterThan(currentDateTime, PageRequest.of(pageNumber, BATCH_SIZE));
                 List<EventWithVenueDocument> batchCombinedData = new ArrayList<>();
 
                 eventPage.getContent().forEach(event -> {
@@ -117,6 +123,38 @@ public class EventSyncService {
         } catch (Exception e) {
             logger.error("Error processing batch: {}", e.getMessage());
             throw new RuntimeException("Batch processing failed", e);
+        }
+    }
+
+    @Scheduled(fixedRate = 180000)
+    public void cleanupPastEvents() {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        AtomicInteger deletedCount = new AtomicInteger(0);
+
+        try {
+            int pageNumber = 0;
+            Page<EventWithVenueDocument> eventPage;
+
+            do {
+                eventPage = eventWithVenueElasticRepository.findByEventEventEndTimeLessThan(
+                        currentDateTime,
+                        PageRequest.of(pageNumber, BATCH_SIZE)
+                );
+
+                List<EventWithVenueDocument> expiredEvents = eventPage.getContent();
+                if (!expiredEvents.isEmpty()) {
+                    eventWithVenueElasticRepository.deleteAll(expiredEvents);
+                    deletedCount.addAndGet(expiredEvents.size());
+                }
+
+                pageNumber++;
+            } while (pageNumber < eventPage.getTotalPages());
+
+            logger.info("Cleanup completed. Deleted {} expired events", deletedCount.get());
+
+        } catch (Exception e) {
+            logger.error("Error during cleanup process: {}", e.getMessage());
+            throw new RuntimeException("Cleanup process failed", e);
         }
     }
 }
