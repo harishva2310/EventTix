@@ -14,6 +14,10 @@ To know more about the tech stack used, [click here](https://eventix.website/abo
 * User-friendly interface with secure backend processing to ensure best customer and event organiser's experience
 * Stripe payments for ticket booking with upcoming feature to enable/disable online payments depending upon organisers request.
 
+## System Design
+
+![system design](https://github.com/harishva2310/EventTix/blob/06eed590642a79d77223ff6dd6868c34e9d88f3d/System%20design.drawio.png)
+
 ## Screenshots
 ![home page](Screenshots/eventix.website_.png)
 
