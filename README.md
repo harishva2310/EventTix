@@ -15,4 +15,5 @@ To know more about the tech stack used, [click here](https://eventix.website/abo
 * Stripe payments for ticket booking with upcoming feature to enable/disable online payments depending upon organisers request.
 
 ## Screenshots
-![home page](https://github.com/harishva2310/EventTix/tree/f41f629eb9aabc381ba1bccce626d01d33316069/Screenshots/HomePage1.png)
+![home page](Screenshots/eventix.website_.png)
+
