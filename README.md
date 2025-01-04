@@ -1,6 +1,9 @@
 # EventTix
 
 An event ticketing system serving small to medium business-owners in the US to create and manage local music events with ticketing and bookings. Ideal for music bars, hotels, community halls, amphitheaters and small artists to be discovered outside the local community. 
+
+Successfully used for 2 actual events with 100+ bookings with QR code verifications for each ticket booking.
+
 Visit here: [EventTix](https://eventix.website)
 
 To know more about the tech stack used, [click here](https://eventix.website/about)
