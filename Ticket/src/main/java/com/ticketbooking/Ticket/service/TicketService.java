@@ -2,6 +2,7 @@ package com.ticketbooking.Ticket.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -52,14 +53,21 @@ public class TicketService {
         List<Ticket> tickets = ticketRepository.findByEventIdAndSectionId(eventId, sectionId);
         logger.info("Fetched tickets for event ID {} and section ID {}: {}", eventId, sectionId, tickets.size());
 
+        // Create a HashSet of reserved ticket IDs for O(1) lookup
+        Set<String> reservedTicketKeys = tickets.stream()
+                .map(ticket -> "ticket_reservation:" + ticket.getTicketId())
+                .filter(key -> redisTemplate.hasKey(key))
+                .collect(Collectors.toSet());
+
+        // Single pass through tickets to update status
         tickets.forEach(ticket -> {
-            String reservationKey = "ticket_reservation:" + ticket.getTicketId();
-            if (redisTemplate.hasKey(reservationKey)) {
+            if (reservedTicketKeys.contains("ticket_reservation:" + ticket.getTicketId())) {
                 logger.info("Ticket ID {} is reserved", ticket.getTicketId());
                 ticket.setTicketStatus("RESERVED");
             }
         });
-        logger.info("Fetched tickets for event ID {} and section ID {}: {}", eventId, sectionId, tickets.size());
+
+        logger.info("Processed reservation status for {} tickets", tickets.size());
         return tickets;
     }
 
@@ -175,16 +183,20 @@ public class TicketService {
 
         List<Ticket> tickets = ticketRepository.findFirstNAvailableTickets(eventId, sectionId, numberOfTickets * 2);
         logger.info("Found {} tickets", tickets.size());
-        // Filter out reserved tickets
+
+        // Create HashSet of reserved ticket keys for O(1) lookup
+        Set<String> reservedTicketKeys = tickets.stream()
+                .map(ticket -> "ticket_reservation:" + ticket.getTicketId())
+                .filter(key -> redisTemplate.hasKey(key))
+                .collect(Collectors.toSet());
+
+        // Filter available tickets using HashSet lookup
         List<Ticket> actuallyAvailableTickets = tickets.stream()
-                .filter(ticket -> {
-                    String reservationKey = "ticket_reservation:" + ticket.getTicketId();
-                    return !redisTemplate.hasKey(reservationKey);
-                })
+                .filter(ticket -> !reservedTicketKeys.contains("ticket_reservation:" + ticket.getTicketId()))
                 .limit(numberOfTickets)
                 .collect(Collectors.toList());
-        logger.info("Found {} available tickets", actuallyAvailableTickets.size());
 
+        logger.info("Found {} available tickets", actuallyAvailableTickets.size());
         return actuallyAvailableTickets;
     }
 }
