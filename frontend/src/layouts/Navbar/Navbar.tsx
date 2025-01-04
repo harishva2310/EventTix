@@ -6,6 +6,8 @@ import { Link } from "react-router-dom"
 import { useAuth0 } from '@auth0/auth0-react'
 import { NotificationBell } from "@/layouts/NotificationsPage/components/NotificationBell";
 import { CartIcon } from "../Cart/CartIconV2"
+import EventTixIcon from '/EventTixIcon.svg'
+
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { isAuthenticated, loginWithRedirect, logout } = useAuth0()
@@ -15,8 +17,8 @@ export function Navbar() {
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="font-bold text-2xl">
-          EventTix
+      <Link to="/" className="font-bold text-2xl flex items-center gap-2">
+        <img src={EventTixIcon} alt="EventTix Icon" width={24} height={24} />EventTix
         </Link>
 
         {/* Desktop Navigation */}
