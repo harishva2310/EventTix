@@ -15,92 +15,130 @@ const ChatBot = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([
         {
-          text: "Hi! I'm your EventTix assistant. I can help you find events, concerts, and shows. Try asking me something like 'Find rock concerts' or 'Shows in New York'!",
-          isUser: false
+            text: "Hi! I'm your EventTix assistant. I can help you find events, concerts, and shows. Try asking me something like 'Find rock concerts' or 'shows in New York'!",
+            isUser: false
         }
-      ]);
+    ]);
     const [inputText, setInputText] = useState('');
     const navigate = useNavigate();
 
-    const extractSearchQuery = (response: string): string => {
-        const match = response.match(/SEARCH_EVENTS:\s*(.*)/);
-        return match ? match[1].trim() : '';
+    const handleSendMessage = async () => {
+        if (!inputText.trim()) return;
+
+        setMessages(prev => [...prev, { text: inputText, isUser: true }]);
+
+        try {
+            const searchPrompt = `
+                OBJECTIVE: Convert user query "${inputText}" into search parameters matching our API structure.
+
+                AVAILABLE SEARCH FIELDS:
+                - query: Main search across event names, descriptions, artists, venue names, cities, states, countries, and event types.
+                - eventType: For now, default to Concert
+                - city: Venue city
+                - country: Venue country
+                - eventDate: Event timing
+
+                RESPONSE FORMAT:
+                SEARCH_PARAMS: {
+                    "query": "primary search terms as specified in the query above",
+                    "city": "city if mentioned",
+                    "country": "country if mentioned (example: United States, United Kingdom)",
+                    "eventType": "event type if specified",
+                    "eventDate": "date if mentioned"
+                }
+
+                Example: Find me concerts in New York
+                RESPONSE: SEARCH_PARAMS: {"query": "New York", "eventType": "Concert"}
+
+                Example: Find me Metallica concerts
+                RESPONSE: SEARCH_PARAMS: {"query": "Metallica", "eventType": "Concert"}
+
+                Example: Find me Metallica concerts in New Jersey
+                RESPONSE: SEARCH_PARAMS: {"query": "Metallica New Jersey", "eventType": "Concert"}
+
+                PRIORITIZE:
+                1. Artist/performer names in query field
+                2. Specific locations in city/country fields
+                3. Clear event types
+                4. Date specifications
+            `;
+
+            const searchResponse = await getChatResponse(searchPrompt);
+            console.log("Gemini Response:", searchResponse);
+
+            const paramsMatch = searchResponse.match(/SEARCH_PARAMS:\s*({[\s\S]*?})/);
+            if (!paramsMatch) {
+                throw new Error('Invalid search parameters format');
+            }
+
+            const searchParams = JSON.parse(paramsMatch[1]);
+            console.log("Extracted Search Params:", searchParams);
+
+            const queryParams = new URLSearchParams();
+            if (searchParams.query) queryParams.append('query', searchParams.query);
+            //if (searchParams.eventType) queryParams.append('eventType', searchParams.eventType);
+            if (searchParams.city) queryParams.append('city', searchParams.city);
+            if (searchParams.country) queryParams.append('country', searchParams.country);
+            if (searchParams.eventDate) queryParams.append('eventDate', searchParams.eventDate);
+            queryParams.append('page', '0');
+            queryParams.append('size', '100');
+
+            const events = await searchEvents(queryParams.toString());
+
+            const analysisPrompt = `
+                CONTEXT:
+                User Query: "${inputText}"
+                Search Results: ${JSON.stringify(events)}
+
+                ANALYSIS GUIDELINES:
+                1. Match relevance based on:
+                   - Event name matches
+                   - Venue location accuracy
+                   - Date/time relevance
+                   - Artist/performer matches
+                2. Highlight key details:
+                   - Event names
+                   - Venues
+                   - Dates
+                   - Featured performers
+
+                FORMAT:
+                - Start with result quantity and relevance
+                - Highlight best matches first
+                - Include DISPLAY_EVENTS if results found
+                - Suggest refined search parameters if results are not ideal
+                - Do not include SEARCH_PARAMS in the response
+                - Have a human-like response
+                - Summarise results in a natural human-like way
+            `;
+
+            const analysisResponse = await getChatResponse(analysisPrompt);
+            const shouldDisplayEvents = analysisResponse.includes('DISPLAY_EVENTS');
+            const responseText = analysisResponse.replace('DISPLAY_EVENTS', '').replace(/\*/g, '').trim();
+            console.log("responseText:", analysisResponse);
+
+            setMessages(prev => [...prev, {
+                text: responseText,
+                isUser: false,
+                events: shouldDisplayEvents ? events : undefined
+            }]);
+
+        } catch (error) {
+            console.error("Search error:", error);
+            setMessages(prev => [...prev, {
+                text: "Let's try a different way to search for those events.",
+                isUser: false
+            }]);
+        }
+
+        setInputText('');
     };
 
-    const searchEvents = async (query: string) => {
-        const response = await fetch(`/api/EventSearch/v4/search?query=${encodeURIComponent(query)}&page=0&size=100`);
+    const searchEvents = async (queryString: string) => {
+        const response = await fetch(`/api/EventSearch/v4/search?${queryString}`);
         const data = await response.json();
         return data.content;
     };
-
-    const handleSendMessage = async () => {
-        if (!inputText.trim()) return;
-      
-        setMessages(prev => [...prev, { text: inputText, isUser: true }]);
-        
-        try {
-          const searchPrompt = `
-            User query: "${inputText}"
-            You are a search assistant. Break down this query into a maximum of 5 specific search terms.
-            Format each term on a new line starting with SEARCH_TERM:
-            Examples:
-            User: "Any rock shows in NYC or LA next month?"
-            Response:
-            SEARCH_TERM: New York
-            SEARCH_TERM: Los Angeles
-            
-
-            User: "Any upcoming Metallica concerts?"
-            Response:
-            SEARCH_TERM: Metallica
-          `;
-          console.log("searchPrompt: "+searchPrompt);
-          const searchTerms = await getChatResponse(searchPrompt);
-          const terms = searchTerms.split('\n')
-            .filter(line => line.startsWith('SEARCH_TERM:'))
-            .map(line => line.replace('SEARCH_TERM:', '').trim());
-      
-          let allEvents: EventResponse[] = [];
-          
-          for (const term of terms) {
-            const events = await searchEvents(term);
-            allEvents = [...allEvents, ...events];
-          }
-      
-          // Remove duplicates based on event_id
-          const uniqueEvents = Array.from(
-            new Map(allEvents.map(event => [event.event.event_id, event])).values()
-          );
-      
-          const analysisPrompt = `
-            User query: "${inputText}"
-            Search results: ${JSON.stringify(uniqueEvents)}
-            Analyze these results and provide a natural response like "Here are events which matches your request" if there are matching events else respond like "I am sorry, there seems to be no events matching your request". Include location matches, dates, and relevance.
-            End with DISPLAY_EVENTS if results should be shown.
-          `;
-          console.log("Analysis Promopt: "+analysisPrompt);
-      
-          const analysisResponse = await getChatResponse(analysisPrompt);
-          const shouldDisplayEvents = analysisResponse.includes('DISPLAY_EVENTS');
-          const responseText = analysisResponse.replace('DISPLAY_EVENTS', '').trim().replace('SEARCH_EVENTS:','').trim();
-
-          console.log("Response Text: "+responseText);
-      
-          setMessages(prev => [...prev, { 
-            text: responseText, 
-            isUser: false,
-            events: shouldDisplayEvents ? uniqueEvents : undefined
-          }]);
-      
-        } catch (error) {
-          setMessages(prev => [...prev, { 
-            text: "I'm having trouble processing your request. Please try again.", 
-            isUser: false 
-          }]);
-        }
-      
-        setInputText('');
-      };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter') {

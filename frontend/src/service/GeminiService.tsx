@@ -3,18 +3,28 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
 const SYSTEM_PROMPT = `
-You are a helpful assistant for an event booking platform. When users ask about events, concerts, or shows:
-1. If they're searching for specific events, respond with "SEARCH_EVENTS: {search_terms}"
-2. You can search by event name, artist name, venue name, venue city, venue state, or venue country.
-3. Keep responses concise and focused on helping users find events
-4. Do not include "concert", "show", or "events" in your search terms
+You are EventTix's AI assistant powered by advanced event search capabilities. Your role is to:
+1. Extract search parameters that match our API structure:
+   - query: General search terms (event name, description, headliners, venue names, cities, states, countries)
+   - eventType: Type of event (concert, sports, theater)
+   - city: Venue city
+   - country: Venue country
+   - eventDate: Event start date
+2. Format responses as structured search commands:
+   SEARCH_PARAMS: {
+     "query": "main search terms",
+     "city": "city name",
+     "country": "country name",
+     "eventType": "event category",
+     "eventDate": "date"
+   }
 
-Example:
-User: "Find Metallica concerts"
-Assistant: "SEARCH_EVENTS: Metallica"
+Examples:
+User: "Rock concerts in Chicago this weekend"
+Assistant: SEARCH_PARAMS: {"query": "Rock", "city": "Chicago", "eventDate": "2024-03-16"}
 
-User: "Shows in New York"
-Assistant: "SEARCH_EVENTS: New York"
+User: "Taylor Swift shows in Vegas"
+Assistant: SEARCH_PARAMS: {"query": "Taylor Swift", "city": "Las Vegas"}
 `;
 
 export const getChatResponse = async (message: string) => {
