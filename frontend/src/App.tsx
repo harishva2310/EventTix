@@ -21,6 +21,7 @@ import { UserCalendar } from '@/layouts/EventCalendarPage/EventCalendar';
 import { Toaster } from "@/components/ui/toaster"
 import PaymentFailedPage from './layouts/PaymentFormPage/PaymentFailedPage';
 import { About } from '@/layouts/AboutPage/AboutPage';
+import ChatBot from '@/layouts/Chatbot/chatbot';
 function App() {
   return (
     <Auth0ProviderWithHistory>
@@ -77,6 +78,7 @@ function App() {
                   } />
                 </Routes>
                 </main>
+                <ChatBot />
               <Footer />
               </div>
             </Router>

@@ -15,6 +15,7 @@ public class ElasticSearchUtil {
         List<Query> queries = new ArrayList<>();
 
         // Text search across event and venue fields
+        
         if (searchQuery != null && !searchQuery.trim().isEmpty()) {
             queries.add(Query.of(q -> q.multiMatch(m -> m
                     .fields("event.event_name^2",
@@ -25,7 +26,11 @@ public class ElasticSearchUtil {
                             "event.event_details.amenities",
                             "venue.venue_name^1.5",
                             "venue.venue_address",
-                            "venue.venue_type")
+                            "venue.venue_type",
+                            "venue.venue_country",
+                            "venue.venue_city",
+                            "venue.venue_state",
+                            "venue.venue_country")
                     .query(searchQuery)
                     .minimumShouldMatch("50%")
                     .fuzziness("AUTO")
