@@ -20,6 +20,12 @@ import { toast } from '@/hooks/use-toast'
 import { Plus, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
+interface CustomAttribute {
+    key: string
+    value: string | string[]
+    isArray: boolean
+}
+
 export function EventDetailsPage() {
     const { eventId } = useParams()
     const events = useEventStore(state => state.events)
@@ -29,6 +35,7 @@ export function EventDetailsPage() {
     const [isEditing, setIsEditing] = useState(false)
     const { getAccessTokenSilently } = useAuth0()
     const navigate = useNavigate()
+    const [customAttributes, setCustomAttributes] = useState<CustomAttribute[]>([])
     const [editedEvent, setEditedEvent] = useState(event || {
         event_name: '',
         event_start_time: '',
@@ -46,12 +53,61 @@ export function EventDetailsPage() {
         }
     }, [event])
 
+    useEffect(() => {
+        if (event?.event_details) {
+            const existingAttributes = Object.entries(event.event_details).map(([key, value]) => ({
+                key,
+                value: Array.isArray(value) ? value : String(value),
+                isArray: Array.isArray(value)
+            }))
+            setCustomAttributes(existingAttributes)
+        }
+    }, [event])
+
     const handleInputChange = (key: string, value: any) => {
         console.log(`Updating ${key} to:`, value)
         setEditedEvent(prev => ({
             ...prev,
             [key]: value
         }))
+    }
+
+    const addCustomAttribute = () => {
+        setCustomAttributes([...customAttributes, { key: '', value: '', isArray: false }])
+    }
+
+    const removeCustomAttribute = (index: number) => {
+        setCustomAttributes(customAttributes.filter((_, i) => i !== index))
+    }
+
+    const updateCustomAttribute = (index: number, field: 'key' | 'value', newValue: string) => {
+        const updated = [...customAttributes]
+        updated[index] = { ...updated[index], [field]: newValue }
+        setCustomAttributes(updated)
+    }
+
+    const toggleArrayType = (index: number) => {
+        const updated = [...customAttributes]
+        updated[index] = {
+            ...updated[index],
+            isArray: !updated[index].isArray,
+            value: updated[index].isArray ? '' : []
+        }
+        setCustomAttributes(updated)
+    }
+
+    const addArrayValue = (index: number) => {
+        const updated = [...customAttributes]
+        const currentValue = updated[index].value as string[]
+        updated[index].value = [...currentValue, '']
+        setCustomAttributes(updated)
+    }
+
+    const updateArrayValue = (attrIndex: number, valueIndex: number, newValue: string) => {
+        const updated = [...customAttributes]
+        const values = updated[attrIndex].value as string[]
+        values[valueIndex] = newValue
+        setCustomAttributes(updated)
     }
 
     const handleDetailChange = (key: string, value: any) => {
@@ -157,6 +213,11 @@ export function EventDetailsPage() {
         try {
             const token = await getAccessTokenSilently()
 
+            const customDetailsObject = customAttributes.reduce<Record<string, string | string[]>>((acc, attr) => {
+                acc[attr.key] = attr.isArray ? attr.value : attr.value.toString()
+                return acc
+            }, {})
+
             const mappedEventData = {
                 eventId: Number(eventId),
                 eventName: editedEvent.event_name,
@@ -166,7 +227,10 @@ export function EventDetailsPage() {
                 eventEndTime: editedEvent.event_end_time,
                 eventDescription: editedEvent.event_description,
                 eventType: editedEvent.event_type,
-                eventDetails: editedEvent.event_details
+                eventDetails: {
+                    ...editedEvent.event_details,
+                    ...customDetailsObject
+                }
             }
 
             const response = await axios.post(
@@ -321,7 +385,7 @@ export function EventDetailsPage() {
                         </Select>
                     </div>
 
-                    <div className="space-y-4">
+                    {/*<div className="space-y-4">
                         <h3 className="text-lg font-semibold">Additional Details</h3>
                         {Object.entries(editedEvent.event_details).map(([key, value]) => (
                             <div key={key} className="space-y-2">
@@ -330,6 +394,87 @@ export function EventDetailsPage() {
                             </div>
                         ))}
                     </div>
+                    */}
+
+                    <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                            <h3 className="text-lg font-semibold">Custom Attributes</h3>
+                            {isEditing && (
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={addCustomAttribute}
+                                >
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Add Custom Attribute
+                                </Button>
+                            )}
+                        </div>
+                        {customAttributes.map((attr, index) => (
+                            <div key={index} className="space-y-2 p-4 border rounded-lg">
+                                <div className="flex items-center gap-2">
+                                    <Input
+                                        placeholder="Attribute name"
+                                        value={attr.key}
+                                        onChange={(e) => updateCustomAttribute(index, 'key', e.target.value)}
+                                        disabled={!isEditing}
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => toggleArrayType(index)}
+                                        disabled={!isEditing}
+                                    >
+                                        {attr.isArray ? 'Array' : 'Single'}
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={() => removeCustomAttribute(index)}
+                                        disabled={!isEditing}
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                </div>
+
+                                {attr.isArray ? (
+                                    <div className="space-y-2">
+                                        {(attr.value as string[]).map((val, valueIndex) => (
+                                            <Input
+                                                key={valueIndex}
+                                                value={val}
+                                                onChange={(e) => updateArrayValue(index, valueIndex, e.target.value)}
+                                                placeholder={`Value ${valueIndex + 1}`}
+                                                disabled={!isEditing}
+                                            />
+                                        ))}
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => addArrayValue(index)}
+                                            disabled={!isEditing}
+                                        >
+                                            <Plus className="h-4 w-4 mr-2" />
+                                            Add Value
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    <Input
+                                        value={attr.value as string}
+                                        onChange={(e) => updateCustomAttribute(index, 'value', e.target.value)}
+                                        placeholder="Value"
+                                        disabled={!isEditing}
+                                    />
+                                )}
+                            </div>
+                        ))}
+                    </div>
+
+
+
 
                     {isEditing && (
                         <Button className="mt-4" onClick={() => {
