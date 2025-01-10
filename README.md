@@ -16,6 +16,7 @@ To know more about the tech stack used, [click here](https://eventix.website/abo
 * Booking limits and rate limits to prevent scalpers from hoarding tickets to ensure fair pricing for customers and organisers
 * User-friendly interface with secure backend processing to ensure best customer and event organiser's experience
 * Stripe payments for ticket booking with upcoming feature to enable/disable online payments depending upon organisers request.
+* Use a conversational AI chatbot to quickly search for events
 
 ## System Design
 
