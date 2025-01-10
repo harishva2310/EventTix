@@ -123,7 +123,7 @@ const ChatBot = () => {
     return (
         <div className="fixed bottom-4 right-4 z-50">
             {isOpen ? (
-                <div className="bg-background border rounded-lg shadow-lg w-96 h-[32rem]">
+                <div className="bg-background border rounded-lg shadow-lg w-[calc(90vw-2rem)] md:w-96 h-[80vh] md:h-[32rem] mx-4 md:mx-0">
                     <div className="flex justify-between items-center p-3 border-b">
                         <h3 className="font-semibold">Chat Assistant</h3>
                         <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
