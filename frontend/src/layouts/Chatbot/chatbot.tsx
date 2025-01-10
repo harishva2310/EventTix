@@ -75,14 +75,14 @@ const ChatBot = () => {
           const analysisPrompt = `
             User query: "${inputText}"
             Search results: ${JSON.stringify(uniqueEvents)}
-            Analyze these results and provide a natural response. Include location matches, dates, and relevance.
+            Analyze these results and provide a natural response like "Here are events which matches your request" if there are matching events else respond like "I am sorry, there seems to be no events matching your request". Include location matches, dates, and relevance.
             End with DISPLAY_EVENTS if results should be shown.
           `;
           console.log("Analysis Promopt: "+analysisPrompt);
       
           const analysisResponse = await getChatResponse(analysisPrompt);
           const shouldDisplayEvents = analysisResponse.includes('DISPLAY_EVENTS');
-          const responseText = analysisResponse.replace('DISPLAY_EVENTS', '').trim();
+          const responseText = analysisResponse.replace('DISPLAY_EVENTS', '').trim().replace('SEARCH_EVENTS:','').trim();
 
           console.log("Response Text: "+responseText);
       
