@@ -47,6 +47,7 @@
     "@stomp/stompjs": "^7.0.0",
     "@stripe/react-stripe-js": "^2.8.1",
     "@stripe/stripe-js": "^4.9.0",
+    "@types/dom-speech-recognition": "^0.0.4",
     "@types/react-big-calendar": "^1.15.0",
     "@types/sockjs-client": "^1.5.4",
     "axios": "^1.7.7",
