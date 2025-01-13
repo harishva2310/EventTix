@@ -370,24 +370,26 @@ const ChatBot = () => {
                                 </div>
                             ))}
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex flex-col gap-2 sm:flex-row">
                             <input
                                 type="text"
                                 value={inputText}
                                 onChange={(e) => setInputText(e.target.value)}
                                 onKeyPress={handleKeyPress}
-                                className="flex-1 rounded-md border p-2"
+                                className="flex-1 rounded-md border p-2 min-w-0"
                                 placeholder="Type your message..."
                             />
-                            <Button
-                                onClick={() => startListening()}
-                                variant="ghost"
-                                size="icon"
-                                className={isListening ? 'text-red-500' : ''}
-                            >
-                                {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
-                            </Button>
-                            <Button onClick={handleSendMessage}>Send</Button>
+                            <div className="flex gap-2 justify-end">
+                                <Button
+                                    onClick={() => startListening()}
+                                    variant="ghost"
+                                    size="icon"
+                                    className={`${isListening ? 'text-red-500' : ''} shrink-0`}
+                                >
+                                    {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+                                </Button>
+                                <Button onClick={handleSendMessage} className="shrink-0">Send</Button>
+                            </div>
                         </div>
                     </div>
                 </div>
