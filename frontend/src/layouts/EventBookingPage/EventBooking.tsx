@@ -19,6 +19,7 @@ import { useTicketStore } from '@/stores/TicketStores'
 import { useCartStore } from '@/stores/CartStores'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { CartContent } from '@/layouts/Cart/CartContent'
 
 export default function EventDetailsPage() {
     const { eventId } = useParams()
@@ -271,6 +272,10 @@ export default function EventDetailsPage() {
                         <EventGallerySection images={event.event_details.eventImages} />
                     )}
                 </div>
+            </div>
+
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+                <CartContent variant="floating" />
             </div>
 
             <div className="mt-8">
