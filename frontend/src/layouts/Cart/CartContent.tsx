@@ -176,7 +176,7 @@ export function CartContent({ variant = 'icon' }: CartContentProps) {
             </Dialog>
 
             <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
-                <DialogContent>
+                <DialogContent className="overflow-y-auto max-h-[90vh]">
                     <DialogHeader>
                         <DialogTitle>Complete Payment</DialogTitle>
                     </DialogHeader>

@@ -9,6 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useAuth0 } from '@auth0/auth0-react';
 import { stripePromise } from '@/config/stripeConfig';
+import { useCartStore } from '@/stores/CartStores';
 import axios from 'axios';
 interface CheckoutFormProps {
   clientSecret: string;
@@ -22,6 +23,7 @@ const CheckoutForm = ({ amount, onSuccess, onError }: CheckoutFormProps) => {
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
   const { getAccessTokenSilently } = useAuth0();
+  
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,6 +66,36 @@ const CheckoutForm = ({ amount, onSuccess, onError }: CheckoutFormProps) => {
   );
 };
 
+const CountdownTimer = ({ onTimeout }: { onTimeout: () => void }) => {
+  const [timeLeft, setTimeLeft] = useState(5 * 60); // 5 minutes in seconds
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          onTimeout();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [onTimeout]);
+
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
+
+  return (
+    <div className="text-center p-4 bg-muted/20 rounded-lg mb-4">
+      <p className="text-sm font-medium">
+        You have {minutes}:{seconds.toString().padStart(2, '0')} minutes to complete the transaction
+      </p>
+    </div>
+  );
+};
+
 interface PaymentFormProps {
   amount: number;
   onSuccess: (paymentIntentId: string) => void;
@@ -73,6 +105,12 @@ interface PaymentFormProps {
 export const PaymentForm = ({ amount, onSuccess, onError }: PaymentFormProps) => {
   const [clientSecret, setClientSecret] = useState('');
   const { getAccessTokenSilently } = useAuth0();
+  const setShowPaymentDialog = useCartStore(state => state.setShowPaymentDialog);
+  const handleTimeout = () => {
+    setClientSecret('');
+    setShowPaymentDialog(false);
+    onError('Payment session expired. Please try again.');
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -130,12 +168,16 @@ export const PaymentForm = ({ amount, onSuccess, onError }: PaymentFormProps) =>
         },
       }}
     >
+      <div>
+      <CountdownTimer onTimeout={handleTimeout} />
       <CheckoutForm
         clientSecret={clientSecret}
         amount={amount}
         onSuccess={onSuccess}
         onError={onError}
       />
+      </div>
     </Elements>
+
   );
 };
