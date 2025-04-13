@@ -54,7 +54,7 @@ export default function QRScanner() {
 
       toast({
         title: response.data.valid ? "Valid Ticket ✓" : "Invalid Ticket ✗",
-        description: response.data.message,
+        //description: response.data.message,
         variant: response.data.valid ? "default" : "destructive",
         className: response.data.valid ? "bg-green-500 text-white" : "bg-red-500 text-white"
       })
